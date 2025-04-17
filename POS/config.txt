@@ -1,0 +1,6 @@
+Server=DESKTOP-VFDV5EJ;
+Database=Restaurant;
+Trusted_Connection=True;
+TrustServerCertificate=True;
+
+

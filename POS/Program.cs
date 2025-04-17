@@ -6,12 +6,13 @@ namespace POS
     {
         static void Main(string[] args)
         {
-            Orders order = new Orders();
-            order.Order();
-            foreach (string ord in order.orders)
-            {
-                Console.WriteLine(ord);
-            }
+            Dish dish1 = new Dish();
+            dish1.ShowInfo("Buffalo Cauliflower Wings");
+
+            DishManager dishMan1 = new DishManager();
+            dishMan1.EditDish("Buffalo Cauliflower Wings","Buffalo Cauliflower Wings","Mild",23.40m,"Appetizer",1);
+
+            
         }
     }
 
