@@ -39,6 +39,45 @@ namespace POS
             Console.Write("Dish has been updated successfully.");
 
         }
+
+        public void AddDish(string name, string description, decimal price, string type, int availability)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("AddDishToMenu", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddRange(new SqlParameter[]
+                {
+                    new SqlParameter("@Name", name),
+                    new SqlParameter("@Description", description),
+                    new SqlParameter("@Price", price),
+                    new SqlParameter("@Type", type),
+                    new SqlParameter("@Availability", availability)
+                });
+
+                cmd.ExecuteReader();
+            }
+            Console.WriteLine("Dish has been added successfully to the Menu.");
+        }
+
+        public void RemoveDish(string name)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("RemoveDishFromTheMenuByName", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddRange(new SqlParameter[] 
+                {
+                    new SqlParameter("@Name", name)
+                });
+
+                cmd.ExecuteReader();
+            }
+
+            Console.WriteLine("Dish has been removed successfully from the menu.");
+        }
     }
 }
 
