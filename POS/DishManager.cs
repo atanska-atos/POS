@@ -2,81 +2,74 @@ using System;
 using System.ComponentModel;
 using System.Data;
 using Microsoft.Data.SqlClient;
+using POS;
 
 
 namespace POS
 {
     class DishManager
     {
-        private string _connectionString;
-
-                public DishManager()
+        public void EditDish(string newName, Dish dish)
         {
-            _connectionString = File.ReadAllText("config.txt");
-        }
-        
 
-        public void EditDish(string name, string newName, string description, decimal price, string type, int availability)
-        {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            try{
+
+                DBActions db = new DBActions();
+                db.ExecuteStoredProcedureVoid("UpdateDishByName", cmd => cmd.Parameters.AddRange(new SqlParameter[]
+                    {
+                        new SqlParameter("@Name", "%"+dish.Name+"%"),
+                        new SqlParameter("@NewName", newName),
+                        new SqlParameter("@NewDescription", dish.Description),
+                        new SqlParameter("@NewPrice", dish.Price),
+                        new SqlParameter("@NewType", dish.Type),
+                        new SqlParameter("@NewAvailability", dish.Availability)
+                    }));
+                Console.WriteLine($"Dish has been added successfully to the Menu.");
+            }
+            catch (Exception ex)
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("UpdateDishByName", conn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddRange(new SqlParameter[]
-                {
-                    new SqlParameter("@Name", "%"+name+"%"),
-                    new SqlParameter("@NewName", newName),
-                    new SqlParameter("@NewDescription", description),
-                    new SqlParameter("@NewPrice", price),
-                    new SqlParameter("@NewType", type),
-                    new SqlParameter("@NewAvailability", availability)
-                });
-
-                cmd.ExecuteReader();
+                Console.WriteLine($"Something went wrong: \n{ex}");
             }
             
-            Console.Write("Dish has been updated successfully.");
-
         }
 
-        public void AddDish(string name, string description, decimal price, string type, int availability)
+        public void AddDish(Dish dish)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("AddDishToMenu", conn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddRange(new SqlParameter[]
-                {
-                    new SqlParameter("@Name", name),
-                    new SqlParameter("@Description", description),
-                    new SqlParameter("@Price", price),
-                    new SqlParameter("@Type", type),
-                    new SqlParameter("@Availability", availability)
-                });
 
-                cmd.ExecuteReader();
+            try
+            {
+                DBActions db = new DBActions();
+                db.ExecuteStoredProcedureVoid("AddDishToMenu", cmd => cmd.Parameters.AddRange(new SqlParameter[]
+                    {
+                        new SqlParameter("@Name", dish.Name),
+                        new SqlParameter("@Description", dish.Description),
+                        new SqlParameter("@Price", dish.Price),
+                        new SqlParameter("@Type", dish.Type),
+                        new SqlParameter("@Availability", dish.Availability)
+                    }));
+                Console.WriteLine("Dish has been added successfully to the Menu.");
             }
-            Console.WriteLine("Dish has been added successfully to the Menu.");
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Something went wrong: \n{ex}");
+            }
+            
         }
 
-        public void RemoveDish(string name)
+        public void RemoveDish(Dish dish)
         {
-            using (SqlConnection conn = new SqlConnection(_connectionString))
+            try
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("RemoveDishFromTheMenuByName", conn);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddRange(new SqlParameter[] 
-                {
-                    new SqlParameter("@Name", name)
-                });
+                DBActions db = new DBActions();
+                db.ExecuteStoredProcedureVoid("RemoveDishFromTheMenuByName", cmd => cmd.Parameters.AddWithValue("@Name", dish.Name));
 
-                cmd.ExecuteReader();
+                Console.WriteLine("Dish has been removed successfully from the menu.");
             }
-
-            Console.WriteLine("Dish has been removed successfully from the menu.");
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Cannot connect to the database correctly. Exception {ex}");
+            }
+            
         }
     }
 }
